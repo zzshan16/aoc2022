@@ -5,46 +5,17 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-static inline void increment_part1(int* count, int min0, int max0, int min1, int max1){
-  if (min0 < min1){
-    if (max0 >= max1){
-      (*count)++;
-    }
-  }
-  else if (min0 == min1){
-    (*count)++;
-  }
-  else{
-    if (max0 <= max1){
-      (*count)++;
-    }
-  }
-}
-static inline void increment_part2(int* count, int min0, int max0, int min1, int max1){
-  if (min0 < min1){
-    if(max0 < min1){
-    }
-    else{
-      (*count)++;
-    }
-  }
-  else if (min0 == min1){
-    (*count)++;
-  }
-  else{
-    if (min0 > max1){
-    }
-    else{
-      (*count)++;
-    }
-  }
+static inline void increment_counts(int* count0, int* count1, int min0, int max0, int min1, int max1){
+  if (min0 > max1 || min1 > max0) return;
+  if ((max0 >= max1 && min0 <= min1) || (max0 <= max1 && min0 >= min1))
+    (*count0)++;
+  (*count1)++;
 }
 static inline int process_fun(char* map, size_t size){
-  char buf[400];
-  int min0, max0, min1, max1, a, count0, count1;
+  int a, count0, count1;
+  int nums[4];
   size_t offset = 0;
   a = count0 = count1 = 0;
-  memset(buf, 0, 400);
   while(offset<size){
     switch(map[offset]){
     case '-':
@@ -52,19 +23,15 @@ static inline int process_fun(char* map, size_t size){
       a++;
       break;
     case '\n':
-      min0 = atoi(buf);
-      max0 = atoi(buf+100);
-      min1 = atoi(buf+200);
-      max1 = atoi(buf+300);
       if (a == 3){
-	increment_part1(&count0, min0, max0, min1, max1);
-	increment_part2(&count1, min0, max0, min1, max1);
+	increment_counts(&count0, &count1, nums[0], nums[1], nums[2], nums[3]);
       }
-      memset(buf, 0, 400);
       a = 0;
+      memset(nums, 0, 4*sizeof(int));
       break;
     default:
-      buf[(100 * a) + strlen(100*a + buf)] = map[offset];
+      nums[a] *= 10;
+      nums[a] += map[offset] - '0';
       break;
     }
     offset++;
