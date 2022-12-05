@@ -10,10 +10,6 @@
 
 char* global_buf;
 static inline void move_fun(unsigned char* dest, unsigned char* source, int num){
-  /* if (*source_height - num < 0){ */
-  /*   printf("would go below zero, height %d moving %d\n", *source_height, num); */
-  /*   //exit(3); */
-  /* } */
   uint16_t* dest_height = dest;
   uint16_t* source_height = source;
   memcpy(global_buf, source+*source_height -num +2, num);
@@ -25,10 +21,6 @@ static inline void move_fun(unsigned char* dest, unsigned char* source, int num)
   }
 }
 static inline void move_fun2(unsigned char* dest, unsigned char* source, int num){
-  /* if (*source_height - num < 0){ */
-  /*   printf("would go below zero\n"); */
-  /*   //exit(3); */
-  /* } */
   uint16_t* dest_height = dest;
   uint16_t* source_height = source;
   memcpy(dest + *dest_height + 2, source + *source_height - num +2, num);
@@ -64,9 +56,9 @@ void process_fgets(){
     default:;
       x = i>>2;
       t = *(uint16_t*)(stacks[x]);
-      *(stacks[x] + 32768 - t) = buf[i];
+      *(stacks[x] + 32767 - t) = buf[i];
       *(uint16_t*)(stacks[x]) += 1;
-      *(stacks[x+num_stacks] + 32768 - t) = buf[i];
+      *(stacks[x+num_stacks] + 32767 - t) = buf[i];
       *(uint16_t*)(stacks[x+num_stacks]) += 1;
       break;
     } 
@@ -84,9 +76,9 @@ void process_fgets(){
 	break;
       default:
 	t = *(uint16_t*)(stacks[i]);
-	*(stacks[i] + 32768 - t) = x;
+	*(stacks[i] + 32767 - t) = x;
 	*(uint16_t*)(stacks[i]) += 1;
-	*(stacks[i+num_stacks] + 32768 - t) = x;
+	*(stacks[i+num_stacks] + 32767 - t) = x;
 	*(uint16_t*)(stacks[i+num_stacks]) += 1;
 	break;
       }
@@ -94,7 +86,7 @@ void process_fgets(){
   }
  next:
   for(int i = 0; i < num_stacks<<1ul; ++i){
-    memmove(stacks[i] + 2, stacks[i] + 32768 - *(uint16_t*)(stacks[i])+1, *(uint16_t*)(stacks[i]));
+    memmove(stacks[i] + 2, stacks[i] + 32768 - *(uint16_t*)(stacks[i]), *(uint16_t*)(stacks[i]));
   }
   /* for(int i = 0; i < num_stacks; ++i){ */
   /*   printf("stack %d top is %c length is %u\n", i+1, *(stacks[i]+ *(uint16_t*)(stacks[i]) +1), *(uint16_t*)(stacks[i])); */
@@ -134,11 +126,15 @@ void process_fgets(){
     printf("%c", *(stacks[i]+ *(uint16_t*)(stacks[i])+ 1));
   }
   printf("\n");
+  for(int i = 0; i < (num_stacks<<1u); ++i){
+    free(*(stacks+i));
+  }
+  free(stacks);
   fclose(fp);
 }
 
 int main(int argc, char** argv){
-  global_buf = malloc(50000);
+  global_buf = malloc(4096);
   process_fgets();
   free(global_buf);
   return 0;
