@@ -5,17 +5,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-static inline void increment_counts(int* count0, int* count1, int min0, int max0, int min1, int max1){
-  if (min0 > max1 || min1 > max0) return;
-  if ((max0 >= max1 && min0 <= min1) || (max0 <= max1 && min0 >= min1))
-    (*count0)++;
-  (*count1)++;
-}
+
 static inline int process_fun(char* map, size_t size){
   int a, count0, count1;
   int nums[4];
   size_t offset = 0;
   a = count0 = count1 = 0;
+  memset(nums,0,4*sizeof(int));
   while(offset<size){
     switch(map[offset]){
     case '-':
@@ -23,9 +19,8 @@ static inline int process_fun(char* map, size_t size){
       a++;
       break;
     case '\n':
-      if (a == 3){
-	increment_counts(&count0, &count1, nums[0], nums[1], nums[2], nums[3]);
-      }
+      if ((nums[0]-nums[2]) * (nums[1]-nums[3]) <= 0) count0++;
+      if ((nums[0]-nums[3]) * (nums[1]-nums[2]) <= 0) count1++;
       a = 0;
       memset(nums, 0, 4*sizeof(int));
       break;
