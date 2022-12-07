@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <math.h>
 #include "split.h"
+#include <stdint.h>
 #define WINDOW_SIZE 4
 
 int main(int argc, char** argv){
@@ -37,13 +38,14 @@ int main(int argc, char** argv){
     printf("found soln %ld\n", nextp - input_map);
   }
  loopback:
-  remaining = moved = 0;
+  //remaining = moved = 0;
   mapping[*beginp++]--;
   mapping[*nextp]++;
   if (mapping[*nextp++] == 1){
-    for( int i = 0; i < 128; ++i){
-      if (mapping[i] > 1)
+    for(unsigned int i = 0x20; i < 0x7E; i+=8){
+      if( (*(uint64_t*)(mapping+i)) & 0xFEFEFEFEFEFEFEFE){
 	goto loopback;
+      }
     }
     printf("done %ld\n", nextp - input_map);
     goto done;
