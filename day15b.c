@@ -21,18 +21,12 @@ void process_fgets(){
   int num_sens = 0;
   sen sens[100];
   sen* senp;
-  char *arr = malloc(10000000);
   int *barr = malloc(10000*sizeof(int));
   memset(barr, 0, 10000*sizeof(int));
   int* barr_0 = barr;
   int* barr_1 = barr + 2500;
   int* barr_2 = barr + 5000;
   int* barr_3 = barr + 7500;
-  if (!arr){
-    puts("malloc failed");
-    exit(4);
-  }
-  memset(arr, 0, 10000000);
   while(fgets(buf, 32768, fp)){
     *(buf + strlen(buf) -1) = '\0';
     int sensx;
